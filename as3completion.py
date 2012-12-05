@@ -66,11 +66,15 @@ def generate_tags(folder):
             for vmatch in rpvar.finditer(content):
                 v = Var(vmatch.group(1), vmatch.group(2))
                 c.add_member(v)
+                classes.append(c)
                 print '    %s %s' % (v.t, v.name)
             for fmatch in rpfunction.finditer(content):
                 f = Function(fmatch.group(1), fmatch.group(2) or 'void')
                 c.add_member(f)
                 print '    %s %s()' % (f.name, f.ret)
+
+def complete(line):
+    return [{'word' : 'just testing', 'kind' : 'v'}, {'word' : 'moar testing', 'kind' : 'f'}]
 
 if __name__ == '__main__':
     print generate_tags(LIB_FOLDER)
