@@ -73,8 +73,8 @@ def generate_tags(folder):
                 c.add_member(f)
                 print '    %s %s()' % (f.name, f.ret)
 
-def complete(line):
-    return [{'word' : 'just testing', 'kind' : 'v'}, {'word' : 'moar testing', 'kind' : 'f'}]
+def complete(page, position):
+    return [{'word' : str(position), 'kind' : 'v'}, {'word' : 'moar testing', 'kind' : 'f'}]
 
 if __name__ == '__main__':
     print generate_tags(LIB_FOLDER)

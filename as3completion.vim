@@ -12,12 +12,13 @@ python << EOF
 import vim
 import as3completion
 reload(as3completion)
-vim.command('let res = %s' % as3completion.complete(vim.eval('a:base')))
-vim.command('echo res')
+page = ''.join(vim.current.buffer[:])
+position = vim.current.window.cursor
+position = (position[1], position[0] - 1)
+vim.command('let res = %s' % as3completion.complete(page, position))
 vim.command('return res')
 EOF
     endif
 endfun
 
 set omnifunc=As3Complete
-
