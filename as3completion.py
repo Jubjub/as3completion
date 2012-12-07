@@ -7,6 +7,8 @@ rclass = re.compile(r'^\s*public\s+class\s+(\w+)', re.MULTILINE)
 rpvar = re.compile(r'^\s*public\s+var\s+(\w+)\s*:\s*(\w+)', re.MULTILINE)
 rpfunction = re.compile(r'^\s*public\s+function\s+(\w+)\s*\(.*\):?(\w+)?', re.MULTILINE)
 
+tags = []
+
 class Class():
     def __init__(self, name):
         self.name = name
@@ -15,6 +17,9 @@ class Class():
     def add_member(self, member):
         member.owner = self
         self.members.append(member)
+
+    def suggestion(self):
+        return {'word' : self.name, 'kind' : 'v'}
 
 class Var():
     def __init__(self, name, t):
@@ -51,8 +56,7 @@ def generate_tags(folder):
             path = os.path.join(root, f)
             if path.endswith('.as'):
                 paths.append(path)
-    print 'found %s as3 files' % len(paths)
-    classes = []
+    #print 'found %s as3 files' % len(paths)
     for path in paths:
         f = open(path, 'rb')
         text = f.read()
@@ -60,22 +64,27 @@ def generate_tags(folder):
         # match classes
         for match in rclass.finditer(text):
             name = match.group(1)
-            print name
+            #print name
             c = Class(name)
             content = extract_bracket_content(text, match.start())
             for vmatch in rpvar.finditer(content):
                 v = Var(vmatch.group(1), vmatch.group(2))
                 c.add_member(v)
-                classes.append(c)
-                print '    %s %s' % (v.t, v.name)
+                tags.append(c)
+                #print '    %s %s' % (v.t, v.name)
             for fmatch in rpfunction.finditer(content):
                 f = Function(fmatch.group(1), fmatch.group(2) or 'void')
                 c.add_member(f)
-                print '    %s %s()' % (f.name, f.ret)
+                #print '    %s %s()' % (f.name, f.ret)
 
-def complete(page, position):
-    return [{'word' : str(position), 'kind' : 'v'}, {'word' : 'moar testing', 'kind' : 'f'}]
+def complete(page, position, word):
+    #return [{'word' : word, 'kind' : 'v'}, {'word' : str(position), 'kind' : 't'}]
+    return [x.suggestion() for x in tags if x.name.startswith(word)]
+    #return [{'word' : word, 'kind' : 'v'}, {'word' : str(position), 'kind' : 't'}] + [x.suggestion() for x in tags if x.name.startswith(word)]
+
+def main():
+    generate_tags(LIB_FOLDER)
 
 if __name__ == '__main__':
-    print generate_tags(LIB_FOLDER)
+    main
 
